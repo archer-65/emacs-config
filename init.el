@@ -118,7 +118,7 @@
   (general-create-definer rune/leader-keys
     ;:keymaps '(normal insert visual emacs)
     ;:prefix "SPC"
-    :prefix "C-S-SPC")
+    :prefix "C-C")
 
   (rune/leader-keys
     "t"  '(:ignore t :which-key "toggles")
