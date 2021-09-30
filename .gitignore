@@ -1,0 +1,6 @@
+auto-save-list/*
+elpa/*
+transient/*
+projectile-bookmarks.eld
+*.el~
+forge-database.sqlite
