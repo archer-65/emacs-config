@@ -1,6 +1,10 @@
 ;; You will most likely need to adjust this font size for your system!
 (defvar runemacs/default-font-size 180)
 
+;; Set transparency
+(set-frame-parameter (selected-frame) 'alpha '(90 75))
+(add-to-list 'default-frame-alist '(alpha 90 75))
+
 ;; Startup
 (setq inhibit-startup-message t)    
 
