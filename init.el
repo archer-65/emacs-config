@@ -197,14 +197,14 @@
  ;; If there is more than one, they won't work right.
  )
 
-(defun efs/org-mode-setup ()
+(defun archer-65/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
   (visual-line-mode 1))
 
 ;; Org Mode Configuration ------------------------------------------------------
 
-(defun efs/org-font-setup ()
+(defun archer-65/org-font-setup ()
   ;; Replace list hyphen with dot
   (font-lock-add-keywords 'org-mode
                           '(("^ *\\([-]\\) "
@@ -231,10 +231,10 @@
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
 (use-package org
-  :hook (org-mode . efs/org-mode-setup)
+  :hook (org-mode . archer-65/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
-  (efs/org-font-setup))
+  (archer-65/org-font-setup))
 
 (use-package org-bullets
   :after org
@@ -242,15 +242,23 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(defun efs/org-mode-visual-fill ()
+(defun archer-65/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
-  :hook (org-mode . efs/org-mode-visual-fill))
+  :hook (org-mode . archer-65/org-mode-visual-fill))
+
+;; Date
+(setq-default org-display-custom-times t)
+(setq org-time-stamp-custom-formats
+      '("<%d %b %Y>" . "<%d/%m/%y %a %H:%M>"))
 
 ;; LaTeX export settings
+(setq org-latex-pdf-process
+      '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+
 (require 'ox-latex)
 (unless (boundp 'org-latex-classes)
   (setq org-latex-classes nil))
@@ -261,9 +269,33 @@
 ;; Article 
 (add-to-list 'org-latex-classes
              '("article"
-               "\\documentclass{article}"
+               "\\documentclass[11pt,a4paper]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
+\\usepackage{fixltx2e}
+\\usepackage{graphicx}
+\\usepackage{longtable}
+\\usepackage{float}
+\\usepackage{wrapfig}
+\\usepackage{rotating}
+\\usepackage[normalem]{ulem}
+\\usepackage{amsmath}
+\\usepackage{textcomp}
+\\usepackage{marvosym}
+\\usepackage{wasysym}
+\\usepackage{amssymb}
+\\usepackage{hyperref}
+\\usepackage{mathpazo}
+\\usepackage{color}
+\\usepackage{enumerate}
+\\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\\tolerance=1000
+      [NO-DEFAULT-PACKAGES]
+      [PACKAGES]
+      [EXTRA]
+\\linespread{1.1}
+\\hypersetup{pdfborder=0 0 0}"
                ("\\section{%s}" . "\\section*{%s}")
                ("\\subsection{%s}" . "\\subsection*{%s}")
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")))
