@@ -211,8 +211,8 @@
   :hook (org-mode . archer-65/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
-  (archer-65/org-font-setup)
-  (setq org-startup-with-inline-images t))
+  ;(setq org-startup-with-inline-images t)
+  (archer-65/org-font-setup))
 
 (use-package org-bullets
   :after org
@@ -222,7 +222,7 @@
   (org-bullets-bullet-list '("✙" "♱" "♰" "☥" "✞" "✟" "✝" "†" "✠" "✚" "✜" "✛" "✢" "✣" "✤" "✥")))
 
 (defun archer-65/org-mode-visual-fill ()
-  (setq visual-fill-column-width 160
+  (setq visual-fill-column-width 140
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
