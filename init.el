@@ -211,6 +211,7 @@
   :hook (org-mode . archer-65/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
+  (setq org-pretty-entities t)
   ;(setq org-startup-with-inline-images t)
   (archer-65/org-font-setup))
 
