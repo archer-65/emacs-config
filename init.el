@@ -5,7 +5,7 @@
 (defvar archer-65/default-variable-font-size 180)
 
 ;; Make frame transparency overridable
-(defvar archer-65/frame-transparency '(95 . 95))
+(defvar archer-65/frame-transparency '(100 . 100))
 
 ;; The default is 800 kilobytes.  Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
@@ -79,6 +79,34 @@
                 ;treemacs-mode-hook
                 ;eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(use-package dashboard
+  :ensure t
+  :diminish dashboard-mode
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-items '((recents  . 5)
+                                              (bookmarks . 5)))
+  (setq dashboard-set-haeding-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-startup-banner "~/.emacs.d/imgs/dashlogo.png")
+  (setq dashboard-banner-logo-title "Welcome to FlambagEmacs, the horniest Emacs Config.")
+  (setq dashboard-set-navigator t)
+  (setq dashboard-navigator-buttons
+        `(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+            "Homepage"
+            "Browse homepage"
+            (lambda (&rest _) (browse-url "https://github.com/archer-65/emacs-config")))
+
+           (,(all-the-icons-faicon "archive" :height 1.1 :v-adjust 0.0)
+            "Update Packages"
+            "Click to updates your packages"
+            (lambda (&rest _) (auto-package-update-now)))
+
+           (,(all-the-icons-octicon "gear" :height 1.1 :v-adjust 0.0)
+            "Configuration"
+            "Click to config FlambagEmacs"
+            (lambda (&rest _) (find-file "~/.emacs.d/Emacs.org")))))))
 
 (set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
 
@@ -328,16 +356,3 @@
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(orderless vertico which-key visual-fill-column use-package rainbow-delimiters org-bullets no-littering helpful forge doom-themes doom-modeline dired-single dired-hide-dotfiles auto-package-update all-the-icons-dired)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
