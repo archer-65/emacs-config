@@ -2,5 +2,6 @@ auto-save-list/*
 elpa/*
 transient/*
 projectile-bookmarks.eld
-*.el~
+var/*
 forge-database.sqlite
+.last-package-update-day
