@@ -351,7 +351,8 @@ This section contains the basic configuration for =org-mode= plus the configurat
     :hook (org-mode . archer-65/org-mode-setup)
     :config
     (setq org-ellipsis " ▾")
-
+  
+    (archer-65/org-font-setup)
 #+end_src
 
 *** Nicer Heading Bullets

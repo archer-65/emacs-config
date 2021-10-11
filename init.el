@@ -223,6 +223,8 @@
   :hook (org-mode . archer-65/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
+  
+  (archer-65/org-font-setup)
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode)
