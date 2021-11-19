@@ -116,7 +116,7 @@
 (set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular)
 
 (use-package doom-themes
-  :init (load-theme 'doom-nord t))
+  :init (load-theme 'doom-dracula t))
 
 (use-package all-the-icons)
 
@@ -299,6 +299,11 @@
 
 (setq org-latex-minted-options '(("breaklines" "true")
                                  ("breakanywhere" "true")))
+
+(use-package ox-reveal
+  :ensure ox-reveal)
+
+(setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 
 (with-eval-after-load 'org
   (org-babel-do-load-languages
