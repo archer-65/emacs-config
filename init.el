@@ -107,13 +107,23 @@
             "Click to config Emacs"
             (lambda (&rest _) (find-file "~/.emacs.d/Emacs.org")))))))
 
-(set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
+(defun archer-65/set-font-faces ()
+  (message "Setting faces")
+  (set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
 
-;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
+  ;; Set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
 
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular)
+  ;; Set the variable pitch face
+  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular))
+
+(if (daemonp)
+    (add-hook 'after-make-frame-functions
+              (lambda (frame)
+                ;; (setq doom-modeline-icon t)
+                (with-selected-frame frame
+                  (archer-65/set-font-faces))))
+  (archer-65/set-font-faces))
 
 (use-package doom-themes
   :init (load-theme 'doom-dracula t))
