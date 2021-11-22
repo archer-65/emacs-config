@@ -72,21 +72,18 @@
 (set-frame-parameter (selected-frame) 'alpha archer-65/frame-transparency)
 (add-to-list 'default-frame-alist `(alpha . ,archer-65/frame-transparency))
 
-(use-package all-the-icons)
-
 ;; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
-                                        ;term-mode-hook
-                                        ;shell-mode-hook
-                treemacs-mode-hook))
-                                        ;eshell-mode-hook))
+(dolist (mode '(org-mode-hook))
+                ;term-mode-hook
+                ;shell-mode-hook
+                ;treemacs-mode-hook
+                ;eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (use-package dashboard
   :ensure t
   :config
   (dashboard-setup-startup-hook)
-  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
   (setq dashboard-items '((recents  . 5)
                           (bookmarks . 5)))
   (setq dashboard-set-haeding-icons t)
@@ -95,8 +92,7 @@
   (setq dashboard-startup-banner 'logo)
   (setq dashboard-set-navigator t)
   (setq dashboard-navigator-buttons
-        `(
-          ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+        `(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
             "Homepage"
             "Browse homepage"
             (lambda (&rest _) (browse-url "https://github.com/archer-65/emacs-config")))
@@ -131,6 +127,8 @@
 
 (use-package doom-themes
   :init (load-theme 'doom-dracula t))
+
+(use-package all-the-icons)
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
@@ -194,16 +192,6 @@
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . helpful-variable)
   ([remap describe-key] . helpful-key))
-
-(use-package undo-tree
-  :ensure t
-  :init
-  (global-undo-tree-mode))
-
-(global-set-key (kbd "C-<left>") 'shrink-window-horizontally)
-(global-set-key (kbd "C-<right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "C-<down>") 'shrink-window)
-(global-set-key (kbd "C-<up>") 'enlarge-window)
 
 (defun archer-65/org-font-setup ()
   ;; Replace list hyphen with dot
