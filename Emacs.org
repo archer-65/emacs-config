@@ -173,23 +173,22 @@ This section configures basic UI settings that remove unneeded elements to make 
 
 #+begin_src emacs-lisp
 
-    (defun archer-65/set-font-faces ()
-      (message "Setting faces")
-      (set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
+  (defun archer-65/set-font-faces ()
+    (message "Setting faces")
+    (set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
 
-      ;; Set the fixed pitch face
-      (set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
+    ;; Set the fixed pitch face
+    (set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
 
-      ;; Set the variable pitch face
-      (set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular))
+    ;; Set the variable pitch face
+    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular))
 
-    (if (daemonp)
-        (add-hook 'after-make-frame-functions
-                  (lambda (frame)
-                    ;; (setq doom-modeline-icon t)
-                    (with-selected-frame frame
-                      (archer-65/set-font-faces))))
-      (archer-65/set-font-faces))
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda (frame)
+                  (with-selected-frame frame
+                    (archer-65/set-font-faces))))
+    (archer-65/set-font-faces))
 
 #+end_src
 
@@ -202,7 +201,11 @@ This section configures basic UI settings that remove unneeded elements to make 
 #+begin_src emacs-lisp
 
   (use-package doom-themes
-    :init (load-theme 'doom-dracula t))
+    :init
+    (if (daemonp)
+    (add-hook 'after-make-frame-functions
+          (lambda (frame) (load-theme 'doom-dracula t)))
+    (load-theme 'doom-dracula t)))
 
 #+end_src
 
@@ -303,6 +306,35 @@ For completions let's try [[https://github.com/minad/vertico][Vertico]], replaci
 
 #+end_src
 
+** Centaur Tabs
+
+#+begin_src emacs-lisp
+
+  (use-package centaur-tabs
+    :demand
+    :config
+    (setq centaur-tabs-style "wave"
+          centaur-tabs-height 32
+          centaur-tabs-set-icons t
+          centaur-tabs-set-modified-marker t
+          centaur-tabs-show-navigation-buttons t)
+    (centaur-tabs-headline-match)
+    ;;(centaur-tabs-mode t)
+    ;; Enable centaur-tabs without faulty theming in daemon mode.
+    (if (not (daemonp))
+        (centaur-tabs-mode)
+
+      (defun centaur-tabs-daemon-mode (frame)
+        (unless (and (featurep 'centaur-tabs) (centaur-tabs-mode-on-p))
+          (run-at-time nil nil (lambda () (centaur-tabs-mode)))))
+      (add-hook 'after-make-frame-functions #'centaur-tabs-daemon-mode))
+    ;:hook
+    ;(helpful-mode . centaur-tabs-local-mode)
+    :bind
+    ("C-<prior>" . centaur-tabs-backward)
+    ("C-<next>" . centaur-tabs-forward))
+
+#+end_src
 * Editing
 
 ** Undo Tree

@@ -124,13 +124,16 @@
 (if (daemonp)
     (add-hook 'after-make-frame-functions
               (lambda (frame)
-                ;; (setq doom-modeline-icon t)
                 (with-selected-frame frame
                   (archer-65/set-font-faces))))
   (archer-65/set-font-faces))
 
 (use-package doom-themes
-  :init (load-theme 'doom-dracula t))
+  :init
+  (if (daemonp)
+  (add-hook 'after-make-frame-functions
+        (lambda (frame) (load-theme 'doom-dracula t)))
+  (load-theme 'doom-dracula t)))
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
@@ -194,6 +197,30 @@
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . helpful-variable)
   ([remap describe-key] . helpful-key))
+
+(use-package centaur-tabs
+  :demand
+  :config
+  (setq centaur-tabs-style "wave"
+        centaur-tabs-height 32
+        centaur-tabs-set-icons t
+        centaur-tabs-set-modified-marker t
+        centaur-tabs-show-navigation-buttons t)
+  (centaur-tabs-headline-match)
+  ;;(centaur-tabs-mode t)
+  ;; Enable centaur-tabs without faulty theming in daemon mode.
+  (if (not (daemonp))
+      (centaur-tabs-mode)
+
+    (defun centaur-tabs-daemon-mode (frame)
+      (unless (and (featurep 'centaur-tabs) (centaur-tabs-mode-on-p))
+        (run-at-time nil nil (lambda () (centaur-tabs-mode)))))
+    (add-hook 'after-make-frame-functions #'centaur-tabs-daemon-mode))
+  ;:hook
+  ;(helpful-mode . centaur-tabs-local-mode)
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward))
 
 (use-package undo-tree
   :ensure t
