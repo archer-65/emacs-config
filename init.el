@@ -72,14 +72,12 @@
 (set-frame-parameter (selected-frame) 'alpha archer-65/frame-transparency)
 (add-to-list 'default-frame-alist `(alpha . ,archer-65/frame-transparency))
 
+;; Use package here to avoid strange things in daemon mode
 (use-package all-the-icons)
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
-                                        ;term-mode-hook
-                                        ;shell-mode-hook
                 treemacs-mode-hook))
-                                        ;eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (use-package dashboard
@@ -111,25 +109,9 @@
             "Click to config Emacs"
             (lambda (&rest _) (find-file "~/.emacs.d/Emacs.org")))))))
 
-(defun archer-65/set-font-faces ()
-  (message "Setting faces")
-  (set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
-
-  ;; Set the fixed pitch face
-  (set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
-
-  ;; Set the variable pitch face
-  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular))
-
-(if (daemonp)
-    (add-hook 'after-make-frame-functions
-              (lambda (frame)
-                (with-selected-frame frame
-                  (archer-65/set-font-faces))))
-  (archer-65/set-font-faces))
-
 (use-package doom-themes
   :init
+  ;; Avoid strange things in daemon mode
   (if (daemonp)
   (add-hook 'after-make-frame-functions
         (lambda (frame) (load-theme 'doom-dracula t)))
@@ -198,30 +180,6 @@
   ([remap describe-variable] . helpful-variable)
   ([remap describe-key] . helpful-key))
 
-(use-package centaur-tabs
-  :demand
-  :config
-  (setq centaur-tabs-style "wave"
-        centaur-tabs-height 32
-        centaur-tabs-set-icons t
-        centaur-tabs-set-modified-marker t
-        centaur-tabs-show-navigation-buttons t)
-  (centaur-tabs-headline-match)
-  ;;(centaur-tabs-mode t)
-  ;; Enable centaur-tabs without faulty theming in daemon mode.
-  (if (not (daemonp))
-      (centaur-tabs-mode)
-
-    (defun centaur-tabs-daemon-mode (frame)
-      (unless (and (featurep 'centaur-tabs) (centaur-tabs-mode-on-p))
-        (run-at-time nil nil (lambda () (centaur-tabs-mode)))))
-    (add-hook 'after-make-frame-functions #'centaur-tabs-daemon-mode))
-  ;:hook
-  ;(helpful-mode . centaur-tabs-local-mode)
-  :bind
-  ("C-<prior>" . centaur-tabs-backward)
-  ("C-<next>" . centaur-tabs-forward))
-
 (use-package undo-tree
   :ensure t
   :init
@@ -233,12 +191,24 @@
 (global-set-key (kbd "C-<up>") 'enlarge-window)
 
 (defun archer-65/org-font-setup ()
+  (message "Setting faces")
+  ;; Global fonts
+  (set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
+
+  ;; Set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
+
+  ;; Set the variable pitch face
+  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular) 
+
+  ;; ORG
   ;; Replace list hyphen with dot
   (font-lock-add-keywords 'org-mode
                           '(("^ *\\([-]\\) "
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
   ;; Set faces for heading levels
+  (with-eval-after-load 'org
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
                   (org-level-3 . 1.05)
@@ -260,7 +230,12 @@
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
   (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)))
+
+;; run this hook after we have initialized the first time
+(add-hook 'after-init-hook 'archer-65/org-font-setup)
+;; re-run this hook if we create a new frame from daemonized Emacs
+(add-hook 'server-after-make-frame-hook 'archer-65/org-font-setup)
 
 (defun archer-65/org-mode-setup ()
   (org-indent-mode)
@@ -272,8 +247,6 @@
   :hook (org-mode . archer-65/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
-
-  (archer-65/org-font-setup)
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode)

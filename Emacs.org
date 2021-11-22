@@ -21,6 +21,8 @@ These are Basic UI configuration for font size and frame transparency (if you li
 
 * Startup Performance
 
+Startup performance message.
+
 #+begin_src emacs-lisp
 
   ;; The default is 800 kilobytes.  Measured in bytes.
@@ -84,7 +86,7 @@ You can also use =M-x auto-package-update-now= to update right now!
 
 * Keep Folders Clean
 
-We use the [[https://github.com/emacscollective/no-littering/blob/master/no-littering.el][no-littering]] package to keep folders where we edit files and the Emacs configuration folder clean!  It knows about a wide variety of variables for built in Emacs features as well as those from community packages so it can be much easier than finding and setting these variables yourself.
+The [[https://github.com/emacscollective/no-littering/blob/master/no-littering.el][no-littering]] package to keep folders where we edit files and the Emacs configuration folder clean.
 
 #+begin_src emacs-lisp
 
@@ -103,7 +105,9 @@ We use the [[https://github.com/emacscollective/no-littering/blob/master/no-litt
 
 * Basic UI Configuration
 
-This section configures basic UI settings that remove unneeded elements to make Emacs look a lot more minimal and modern.  If you're just getting started in Emacs, the menu bar might be helpful so you can remove the =(menu-bar-mode -1)= line if you'd like to still see that.
+This section configures basic UI settings that remove unneeded elements to make Emacs look a lot more minimal and modern.
+
+*NOTE:* The first time you load your configuration on a new machine, you'll need to run `M-x all-the-icons-install-fonts` so that mode line icons display correctly.
 
 #+begin_src emacs-lisp
 
@@ -122,14 +126,12 @@ This section configures basic UI settings that remove unneeded elements to make 
   (set-frame-parameter (selected-frame) 'alpha archer-65/frame-transparency)
   (add-to-list 'default-frame-alist `(alpha . ,archer-65/frame-transparency))
 
+  ;; Use package here to avoid strange things in daemon mode
   (use-package all-the-icons)
 
   ;; Disable line numbers for some modes
   (dolist (mode '(org-mode-hook
-                                          ;term-mode-hook
-                                          ;shell-mode-hook
                   treemacs-mode-hook))
-                                          ;eshell-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 #+end_src
@@ -169,29 +171,6 @@ This section configures basic UI settings that remove unneeded elements to make 
 
 #+end_src
 
-** Font Configuration
-
-#+begin_src emacs-lisp
-
-  (defun archer-65/set-font-faces ()
-    (message "Setting faces")
-    (set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
-
-    ;; Set the fixed pitch face
-    (set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
-
-    ;; Set the variable pitch face
-    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular))
-
-  (if (daemonp)
-      (add-hook 'after-make-frame-functions
-                (lambda (frame)
-                  (with-selected-frame frame
-                    (archer-65/set-font-faces))))
-    (archer-65/set-font-faces))
-
-#+end_src
-
 * UI Configuration
 
 ** Color Theme
@@ -202,6 +181,7 @@ This section configures basic UI settings that remove unneeded elements to make 
 
   (use-package doom-themes
     :init
+    ;; Avoid strange things in daemon mode
     (if (daemonp)
     (add-hook 'after-make-frame-functions
           (lambda (frame) (load-theme 'doom-dracula t)))
@@ -212,8 +192,6 @@ This section configures basic UI settings that remove unneeded elements to make 
 ** Better Modeline
 
 [[https://github.com/seagle0128/doom-modeline][doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
-
-*NOTE:* The first time you load your configuration on a new machine, you'll need to run `M-x all-the-icons-install-fonts` so that mode line icons display correctly.
 
 #+begin_src emacs-lisp
 
@@ -306,35 +284,6 @@ For completions let's try [[https://github.com/minad/vertico][Vertico]], replaci
 
 #+end_src
 
-** Centaur Tabs
-
-#+begin_src emacs-lisp
-
-  (use-package centaur-tabs
-    :demand
-    :config
-    (setq centaur-tabs-style "wave"
-          centaur-tabs-height 32
-          centaur-tabs-set-icons t
-          centaur-tabs-set-modified-marker t
-          centaur-tabs-show-navigation-buttons t)
-    (centaur-tabs-headline-match)
-    ;;(centaur-tabs-mode t)
-    ;; Enable centaur-tabs without faulty theming in daemon mode.
-    (if (not (daemonp))
-        (centaur-tabs-mode)
-
-      (defun centaur-tabs-daemon-mode (frame)
-        (unless (and (featurep 'centaur-tabs) (centaur-tabs-mode-on-p))
-          (run-at-time nil nil (lambda () (centaur-tabs-mode)))))
-      (add-hook 'after-make-frame-functions #'centaur-tabs-daemon-mode))
-    ;:hook
-    ;(helpful-mode . centaur-tabs-local-mode)
-    :bind
-    ("C-<prior>" . centaur-tabs-backward)
-    ("C-<next>" . centaur-tabs-forward))
-
-#+end_src
 * Editing
 
 ** Undo Tree
@@ -361,23 +310,35 @@ Enable [[https://www.emacswiki.org/emacs/UndoTree][Undo Tree]] mode with a branc
 
 #+end_src
 
-* Org Mode
+* Org Mode + Font Configuration
 
 [[https://orgmode.org/][Org Mode]] is one of the hallmark features of Emacs.  It is a rich document editor, project planner, task and time tracker, blogging engine, and literate coding utility all wrapped up in one package.
 
 ** Better Font Faces
 
-The =archer-65/org-font-setup= function configures various text faces to tweak the sizes of headings and use variable width fonts in most cases so that it looks more like we're editing a document in =org-mode=.  We switch back to fixed width (monospace) fonts for code blocks and tables so that they display correctly.
+The =archer-65/org-font-setup= function configures various text faces to tweak the sizes of headings and use variable width fonts in most cases so that it looks more like we're editing a document in =org-mode= (and not only, rofl).  
 
 #+begin_src emacs-lisp
 
   (defun archer-65/org-font-setup ()
+    (message "Setting faces")
+    ;; Global fonts
+    (set-face-attribute 'default nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
+
+    ;; Set the fixed pitch face
+    (set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font" :height archer-65/default-font-size)
+
+    ;; Set the variable pitch face
+    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height archer-65/default-variable-font-size :weight 'regular) 
+
+    ;; ORG
     ;; Replace list hyphen with dot
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
     ;; Set faces for heading levels
+    (with-eval-after-load 'org
     (dolist (face '((org-level-1 . 1.2)
                     (org-level-2 . 1.1)
                     (org-level-3 . 1.05)
@@ -399,7 +360,12 @@ The =archer-65/org-font-setup= function configures various text faces to tweak t
     (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
     (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
     (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)))
+
+  ;; run this hook after we have initialized the first time
+  (add-hook 'after-init-hook 'archer-65/org-font-setup)
+  ;; re-run this hook if we create a new frame from daemonized Emacs
+  (add-hook 'server-after-make-frame-hook 'archer-65/org-font-setup)
 
 #+end_src
 
@@ -420,7 +386,6 @@ This section contains the basic configuration for =org-mode= plus the configurat
     :config
     (setq org-ellipsis " ▾")
   
-    (archer-65/org-font-setup)
 #+end_src
 
 *** Nicer Heading Bullets
@@ -527,13 +492,13 @@ We use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]
 
 ** HTML Reveal.js
 
-
 #+begin_src emacs-lisp
   (use-package ox-reveal
     :ensure ox-reveal)
 
   (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 #+end_src
+
 ** Configure Babel Languages
 
 To execute or export code in =org-mode= code blocks, you'll need to set up =org-babel-load-languages= for each language you'd like to use.  [[https://orgmode.org/worg/org-contrib/babel/languages.html][This page]] documents all of the languages that you can use with =org-babel=.
