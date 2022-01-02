@@ -61,8 +61,6 @@
   (auto-package-update-maybe)
   (auto-package-update-at-time "16:00"))
 
-;; NOTE: If you want to move everything out of the ~/.emacs.d folder
-;; reliably, set `user-emacs-directory` before loading no-littering!
 ;(setq user-emacs-directory "~/.cache/emacs")
 
 (use-package no-littering)
@@ -407,6 +405,7 @@
   :config
   (beacon-mode 1))
 
+;; Have to fix it
 (use-package multiple-cursors
   :ensure t
   :bind
@@ -600,8 +599,8 @@
   ("C-c p" . projectile-command-map))
   ;;:init
   ;; NOTE: Set this to the folder where you keep your Git repos!
-  ;;(when (file-directory-p "~/Projects/Code")
-  ;;  (setq projectile-project-search-path '("~/Projects/Code")))
+  ;;(when (file-directory-p "~/Git")
+  ;;  (setq projectile-project-search-path '("~/Git")))
   ;;(setq projectile-switch-project-action #'projectile-dired))
 
 (use-package yaml-mode)
