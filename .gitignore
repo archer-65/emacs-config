@@ -5,3 +5,6 @@ projectile-bookmarks.eld
 var/*
 forge-database.sqlite
 .last-package-update-day
+.cache/*
+quelpa/*
+straight/*
