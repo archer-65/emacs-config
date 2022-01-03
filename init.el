@@ -674,6 +674,8 @@
   :config
   (define-key dired-mode-map (kbd "C-c d") 'dired-hide-dotfiles-mode))
 
+(use-package w3m)
+
 (use-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
   ;:defer 10 ; Wait until 10 seconds after startup
@@ -683,16 +685,11 @@
   (setq mail-user-agent 'mu4e-user-agent)
 
   (require 'mu4e-contrib)
-  (setq mu4e-html2text-command 'mu4e-shr2text)
 
   (setq shr-color-visible-luminance-min 60)
   (setq shr-color-visible-distance-min 5)
   (setq shr-use-colors nil)
   (advice-add #'shr-colorize-region :around (defun shr-no-colourise-region (&rest ignore)))
-
-  (setq mu4e-view-prefer-html t)
-  ;;(setq mu4e-html2text-command "iconv -c -t utf-8 | pandoc -f html -t plain")
-  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
   ;; Load org-mode integration
   (require 'org-mu4e)
@@ -702,7 +699,7 @@
 
   ;; Refresh mail using isync every 10 minutes
   (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-update-interval (* 1 60))
+  (setq mu4e-update-interval (* 5 60))
   (setq mu4e-maildir "~/Mail")
   (setq mu4e-main-buffer-hide-personal-addresses t)
 
@@ -757,33 +754,54 @@
                                            ("/Unina/Bozze"         . ?d)))))))
   ;; Set Bookmarks for all
   (setq  mu4e-bookmarks '(( :name  "Unread messages"
-                                   :query "flag:unread AND NOT flag:trashed"
-                                   :key ?u)
+                            :query "flag:unread AND NOT flag:trashed"
+                            :key ?u)
                           ( :name "Today's messages"
-                                  :query "date:today..now"
-                                  :key ?t)))
+                            :query "date:today..now"
+                            :key ?t)))
 
   (setq mu4e-context-policy 'pick-first)
 
   ;; don't keep message buffers around
   (setq message-kill-buffer-on-exit t)
 
-  (setq archer-65/mu4e-inbox-query
-        "(maildir:/Gmail/Inbox OR maildir:/Outlook/Inbox OR maildir:/Unina/Inbox) AND flag:unread")
-  (mu4e t))
+  ;; Don't ask to quit... why is this the default?
+  (setq mu4e-confirm-quit nil))
+  ;; ;; (setq archer-65/mu4e-inbox-query
+  ;;       "(maildir:/Gmail/Inbox OR maildir:/Outlook/Inbox OR maildir:/Unina/Inbox) AND flag:unread")
+  ;(mu4e t)
 
 (use-package mu4e-alert
   :quelpa (mu4e-alert :fetcher git :url "https://github.com/xzz53/mu4e-alert")
   :after mu4e
   :init
   (mu4e-alert-set-default-style 'libnotify)
-  ;(add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-  :config
-  (setq mu4e-alert-interesting-mail-query archer-65/mu4e-inbox-query)
 
-  (setq mu4e-alert-notify-repeated-mails nil)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
 
-  (mu4e-alert-enable-notifications))
+  (defun mu4e-alert--get-mu4e-frame ()
+    "Try getting a frame containing a mu4e buffer."
+    (car (delq nil (mapcar (lambda (buffer)
+                             (when (and buffer
+                                        (get-buffer-window buffer t))
+                               (window-frame (get-buffer-window buffer t))))
+                           (list mu4e-main-buffer-name)))))
+
+  (defun mu4e-alert-filter-repeated-mails (mails)
+    "Filters the MAILS that have been seen already."
+    (cl-remove-if (lambda (mail)
+                    (prog1 (and (not mu4e-alert-notify-repeated-mails)
+                                (ht-get mu4e-alert-repeated-mails
+                                        (plist-get mail :message-id)))
+                      (ht-set! mu4e-alert-repeated-mails
+                               (plist-get mail :message-id)
+                               t)))
+                  mails))
+
+  (setq mu4e-alert-notify-repeated-mails nil))
+  ;:config
+  ;(setq mu4e-alert-interesting-mail-query archer-65/mu4e-inbox-query)
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
