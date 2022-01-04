@@ -1075,7 +1075,8 @@ Not using this for now, =mu4e-alert=  is broken but I need Desktop Notifications
 
 #+begin_src emacs-lisp
 
-  (use-package w3m)
+  (use-package emojify
+    :hook (after-init . global-emojify-mode))
 
   (use-package mu4e
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -1085,13 +1086,16 @@ Not using this for now, =mu4e-alert=  is broken but I need Desktop Notifications
     ;; Use mu4e for sending e-mail
     (setq mail-user-agent 'mu4e-user-agent)
 
+    (with-eval-after-load "emojify"
+      (delete 'mu4e-headers-mode emojify-inhibit-major-modes))
+
     (require 'mu4e-contrib)
- 
+
     (setq shr-color-visible-luminance-min 60)
     (setq shr-color-visible-distance-min 5)
     (setq shr-use-colors nil)
     (advice-add #'shr-colorize-region :around (defun shr-no-colourise-region (&rest ignore)))
- 
+
     ;; Load org-mode integration
     (require 'org-mu4e)
 
@@ -1167,10 +1171,10 @@ Not using this for now, =mu4e-alert=  is broken but I need Desktop Notifications
     (setq message-kill-buffer-on-exit t)
 
     ;; Don't ask to quit... why is this the default?
-    (setq mu4e-confirm-quit nil))
+    (setq mu4e-confirm-quit nil)
     ;; ;; (setq archer-65/mu4e-inbox-query
     ;;       "(maildir:/Gmail/Inbox OR maildir:/Outlook/Inbox OR maildir:/Unina/Inbox) AND flag:unread")
-    ;(mu4e t)
+    (mu4e t))
 
 #+end_src
 

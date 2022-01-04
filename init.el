@@ -674,7 +674,8 @@
   :config
   (define-key dired-mode-map (kbd "C-c d") 'dired-hide-dotfiles-mode))
 
-(use-package w3m)
+(use-package emojify
+  :hook (after-init . global-emojify-mode))
 
 (use-package mu4e
   :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -683,6 +684,9 @@
 
   ;; Use mu4e for sending e-mail
   (setq mail-user-agent 'mu4e-user-agent)
+
+  (with-eval-after-load "emojify"
+    (delete 'mu4e-headers-mode emojify-inhibit-major-modes))
 
   (require 'mu4e-contrib)
 
@@ -766,10 +770,10 @@
   (setq message-kill-buffer-on-exit t)
 
   ;; Don't ask to quit... why is this the default?
-  (setq mu4e-confirm-quit nil))
+  (setq mu4e-confirm-quit nil)
   ;; ;; (setq archer-65/mu4e-inbox-query
   ;;       "(maildir:/Gmail/Inbox OR maildir:/Outlook/Inbox OR maildir:/Unina/Inbox) AND flag:unread")
-  ;(mu4e t)
+  (mu4e t))
 
 (use-package mu4e-alert
   :quelpa (mu4e-alert :fetcher git :url "https://github.com/xzz53/mu4e-alert")
