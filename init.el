@@ -689,8 +689,8 @@
     message-sendmail-f-is-evil t
     message-sendmail-extra-arguments '("--read-envelope-from")
     send-mail-function 'smtpmail-send-it
-    message-send-mail-function 'message-send-mail-with-sendmail
-    mu4e-compose-signature "Sent from Emacs")
+    message-send-mail-function 'message-send-mail-with-sendmail)
+    ;mu4e-compose-signature "Sent from Emacs")
 
   (with-eval-after-load "emojify"
     (delete 'mu4e-headers-mode emojify-inhibit-major-modes))
@@ -814,18 +814,29 @@
   ;:config
   ;(setq mu4e-alert-interesting-mail-query archer-65/mu4e-inbox-query)
 
-(use-package org-mime
-  :ensure t
+;; (use-package org-mime
+;;   :ensure t
+;;   :config
+;;   (setq org-mime-export-options '(:section-numbers nil
+;;                                                    :with-author nil
+;;                                                    :with-toc nil))
+;;   (add-hook 'org-mime-html-hook
+;;             (lambda ()
+;;               (org-mime-change-element-style
+;;                "pre" (format "color: %s; background-color: %s; padding: 0.5em;"
+;;                              "#E6E1DC" "#232323"))))
+;;   (add-hook 'message-send-hook 'org-mime-htmlize))
+
+(use-package org-msg
+  :after mu4e
   :config
-  (setq org-mime-export-options '(:section-numbers nil
-                                  :with-author nil
-                                  :with-toc nil))
-  (add-hook 'org-mime-html-hook
-        (lambda ()
-          (org-mime-change-element-style
-          "pre" (format "color: %s; background-color: %s; padding: 0.5em;"
-                        "#E6E1DC" "#232323"))))
-  (add-hook 'message-send-hook 'org-mime-htmlize))
+  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+        org-msg-startup "hidestars indent inlineimages"
+        org-msg-default-alternatives '((new		. (text html))
+                                       (reply-to-html	. (text html))
+                                       (reply-to-text	. (text)))
+        org-msg-convert-citation t)
+  (org-msg-mode))
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
