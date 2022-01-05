@@ -995,7 +995,7 @@ Dired is a built-in file manager for Emacs that does some pretty amazing things!
 - =m= - Marks a file
 - =u= - Unmarks a file
 - =U= - Unmarks all files in buffer
-- =* t= - Inverts marked files in buffer
+- ='*' t= - Inverts marked files in buffer
 - =% m= - Mark files in buffer using regular expression
 - =*= - Lots of other auto-marking functions
 - =k= - "Kill" marked items (refresh buffer with =g= / =g r= to get them back)
@@ -1085,6 +1085,13 @@ Not using this for now, =mu4e-alert=  is broken but I need Desktop Notifications
 
     ;; Use mu4e for sending e-mail
     (setq mail-user-agent 'mu4e-user-agent)
+
+    (setq sendmail-program "/usr/bin/msmtp"
+      message-sendmail-f-is-evil t
+      message-sendmail-extra-arguments '("--read-envelope-from")
+      send-mail-function 'smtpmail-send-it
+      message-send-mail-function 'message-send-mail-with-sendmail
+      mu4e-compose-signature "Sent from Emacs")
 
     (with-eval-after-load "emojify"
       (delete 'mu4e-headers-mode emojify-inhibit-major-modes))
@@ -1213,6 +1220,25 @@ Not using this for now, =mu4e-alert=  is broken but I need Desktop Notifications
     (setq mu4e-alert-notify-repeated-mails nil))
     ;:config
     ;(setq mu4e-alert-interesting-mail-query archer-65/mu4e-inbox-query)
+
+#+end_src
+
+** Org Mail
+
+#+begin_src emacs-lisp
+
+  (use-package org-mime
+    :ensure t
+    :config
+    (setq org-mime-export-options '(:section-numbers nil
+                                    :with-author nil
+                                    :with-toc nil))
+    (add-hook 'org-mime-html-hook
+          (lambda ()
+            (org-mime-change-element-style
+            "pre" (format "color: %s; background-color: %s; padding: 0.5em;"
+                          "#E6E1DC" "#232323"))))
+    (add-hook 'message-send-hook 'org-mime-htmlize))
 
 #+end_src
 

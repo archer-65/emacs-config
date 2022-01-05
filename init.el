@@ -685,6 +685,13 @@
   ;; Use mu4e for sending e-mail
   (setq mail-user-agent 'mu4e-user-agent)
 
+  (setq sendmail-program "/usr/bin/msmtp"
+    message-sendmail-f-is-evil t
+    message-sendmail-extra-arguments '("--read-envelope-from")
+    send-mail-function 'smtpmail-send-it
+    message-send-mail-function 'message-send-mail-with-sendmail
+    mu4e-compose-signature "Sent from Emacs")
+
   (with-eval-after-load "emojify"
     (delete 'mu4e-headers-mode emojify-inhibit-major-modes))
 
@@ -806,6 +813,19 @@
   (setq mu4e-alert-notify-repeated-mails nil))
   ;:config
   ;(setq mu4e-alert-interesting-mail-query archer-65/mu4e-inbox-query)
+
+(use-package org-mime
+  :ensure t
+  :config
+  (setq org-mime-export-options '(:section-numbers nil
+                                  :with-author nil
+                                  :with-toc nil))
+  (add-hook 'org-mime-html-hook
+        (lambda ()
+          (org-mime-change-element-style
+          "pre" (format "color: %s; background-color: %s; padding: 0.5em;"
+                        "#E6E1DC" "#232323"))))
+  (add-hook 'message-send-hook 'org-mime-htmlize))
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
