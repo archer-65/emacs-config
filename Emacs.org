@@ -166,7 +166,7 @@ The [[https://github.com/emacscollective/no-littering/blob/master/no-littering.e
      ;; Avoid strange things in daemon mode
      (if (daemonp)
        (add-hook 'after-make-frame-functions
-         (lambda (frame) (load-theme 'base16-rose-pine-moon t)))
+         (lambda (frame) (load-theme 'base16-rose-pine t)))
          (load-theme 'base16-rose-pine-moon t)))
 
 #+end_src

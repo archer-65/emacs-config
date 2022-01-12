@@ -108,7 +108,7 @@
    ;; Avoid strange things in daemon mode
    (if (daemonp)
      (add-hook 'after-make-frame-functions
-       (lambda (frame) (load-theme 'base16-rose-pine-moon t)))
+       (lambda (frame) (load-theme 'base16-rose-pine t)))
        (load-theme 'base16-rose-pine-moon t)))
 
 (use-package doom-modeline
@@ -840,3 +840,16 @@
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("13ecdba8b8bdc126393c1a389b7b3e411e8ae3f8948ddabd160ebfa0501d728c" default)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
