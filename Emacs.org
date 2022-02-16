@@ -1069,8 +1069,6 @@ Dired is a built-in file manager for Emacs that does some pretty amazing things!
 
 * Mail
 
-Not using this for now, =mu4e-alert=  is broken but I need Desktop Notifications!
-
 ** MU4E
 
 #+begin_src emacs-lisp
