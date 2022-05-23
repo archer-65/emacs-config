@@ -35,7 +35,7 @@
   (package-install 'use-package))
 
 (require 'use-package)
-(require 'quelpa-use-package)
+;; (require 'quelpa-use-package)
 (setq use-package-always-ensure t)
 
 ;; straight.el
@@ -78,6 +78,8 @@
 (set-fringe-mode 10)        ; Give some breathing room
 (menu-bar-mode -1)          ; Disable the menu bar
 
+(setq-default cursor-type 'bar)
+
 (column-number-mode)                 
 (global-display-line-numbers-mode t)
 
@@ -95,15 +97,32 @@
 
 (use-package rainbow-mode)
 
-(use-package doom-themes
+;;; For packaged versions which must use `require':
+(use-package modus-themes
+  :ensure
   :init
-  ;; Avoid strange things in daemon mode
-  (if (daemonp)
-  (add-hook 'after-make-frame-functions
-        (lambda (frame) (load-theme 'doom-one t)))
-  (load-theme 'doom-one t)))
+  ;; ;; Add all your customizations prior to loading the themes
+  ;; (setq modus-themes-italic-constructs t
+  ;;       modus-themes-bold-constructs nil
+  ;;       modus-themes-region '(bg-only accented))
+  (setq modus-themes-region '(accented no-extend bg-only)
+        modus-themes-org-blocks 'gray-background)
+  ;; Load the theme files before enabling a theme
+  (modus-themes-load-themes)
+  :config
+  ;; Load the theme of your choice:
+  (modus-themes-load-vivendi) 
+  :bind ("<f5>" . modus-themes-toggle))
 
-;; (use-package base16-theme
+;; (use-package doom-themes
+;;   :init
+;;   ;; Avoid strange things in daemon mode
+;;   (if (daemonp)
+;;   (add-hook 'after-make-frame-functions
+;;         (lambda (frame) (load-theme ' t)))
+;;   (load-theme 'doom-one t)))
+
+;; ;; (use-package base16-theme
 ;;    :init
 ;;    ;; Avoid strange things in daemon mode
 ;;    (if (daemonp)
@@ -112,8 +131,13 @@
 ;;        (load-theme 'base16-rose-pine-moon t)))
 
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+  :ensure t
+  :hook
+  (after-init . doom-modeline-mode)
+  :custom
+  (doom-modeline-height 15)
+  (doom-modeline-bar-width 1)
+  (doom-modeline-buffer-file-name-style 'buffer-name))
 
 (use-package which-key
   :defer 0
@@ -365,6 +389,98 @@
             "Click to config Emacs"
             (lambda (&rest _) (find-file "~/.emacs.d/Emacs.org")))))))
 
+(defun meow-setup ()
+  (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  (meow-motion-overwrite-define-key
+   '("j" . meow-next)
+   '("k" . meow-prev)
+   '("<escape>" . ignore))
+  (meow-leader-define-key
+   ;; SPC j/k will run the original command in MOTION state.
+   '("j" . "H-j")
+   '("k" . "H-k")
+   ;; Use SPC (0-9) for digit arguments.
+   '("1" . meow-digit-argument)
+   '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument)
+   '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument)
+   '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument)
+   '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument)
+   '("0" . meow-digit-argument)
+   '("/" . meow-keypad-describe-key)
+   '("?" . meow-cheatsheet))
+  (meow-normal-define-key
+   '("0" . meow-expand-0)
+   '("9" . meow-expand-9)
+   '("8" . meow-expand-8)
+   '("7" . meow-expand-7)
+   '("6" . meow-expand-6)
+   '("5" . meow-expand-5)
+   '("4" . meow-expand-4)
+   '("3" . meow-expand-3)
+   '("2" . meow-expand-2)
+   '("1" . meow-expand-1)
+   '("-" . negative-argument)
+   '(";" . meow-reverse)
+   '("," . meow-inner-of-thing)
+   '("." . meow-bounds-of-thing)
+   '("[" . meow-beginning-of-thing)
+   '("]" . meow-end-of-thing)
+   '("a" . meow-append)
+   '("A" . meow-open-below)
+   '("b" . meow-back-word)
+   '("B" . meow-back-symbol)
+   '("c" . meow-change)
+   '("d" . meow-delete)
+   '("D" . meow-backward-delete)
+   '("e" . meow-next-word)
+   '("E" . meow-next-symbol)
+   '("f" . meow-find)
+   '("g" . meow-cancel-selection)
+   '("G" . meow-grab)
+   '("h" . meow-left)
+   '("H" . meow-left-expand)
+   '("i" . meow-insert)
+   '("I" . meow-open-above)
+   '("j" . meow-next)
+   '("J" . meow-next-expand)
+   '("k" . meow-prev)
+   '("K" . meow-prev-expand)
+   '("l" . meow-right)
+   '("L" . meow-right-expand)
+   '("m" . meow-join)
+   '("n" . meow-search)
+   '("o" . meow-block)
+   '("O" . meow-to-block)
+   '("p" . meow-yank)
+   '("q" . meow-quit)
+   '("Q" . meow-goto-line)
+   '("r" . meow-replace)
+   '("R" . meow-swap-grab)
+   '("s" . meow-kill)
+   '("t" . meow-till)
+   '("u" . meow-undo)
+   '("U" . meow-undo-in-selection)
+   '("v" . meow-visit)
+   '("w" . meow-mark-word)
+   '("W" . meow-mark-symbol)
+   '("x" . meow-line)
+   '("X" . meow-goto-line)
+   '("y" . meow-save)
+   '("Y" . meow-sync-grab)
+   '("z" . meow-pop-selection)
+   '("'" . repeat)
+   '("<escape>" . ignore)))
+
+(use-package meow
+  :ensure t
+  :init
+  (meow-setup)
+  (meow-global-mode 1))
+
 (use-package undo-tree
   :ensure t
   :init
@@ -372,11 +488,16 @@
 
 (use-package company
   :after lsp-mode
-  :hook (lsp-mode . company-mode)
-  :bind (:map company-active-map
-              ("<tab>" . company-complete-selection))
-        (:map lsp-mode-map
-              ("<tab>" . company-indent-or-complete-common)))
+  :config
+  (add-to-list 'company-backends 'company-nixos-options)
+  (global-company-mode t)
+  :hook
+  (lsp-mode . company-mode)
+  :bind
+  (:map company-active-map
+        ("<tab>" . company-complete-selection))
+  (:map lsp-mode-map
+        ("<tab>" . company-indent-or-complete-common)))
 
 (use-package flycheck
   :ensure t
@@ -433,7 +554,7 @@
   (set-face-attribute 'fixed-pitch nil :font "VictorMono Nerd Font-18") ;;:height archer-65/default-font-size)
 
   ;; Set the variable pitch face
-  (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-18") ;; :height archer-65/default-variable-font-size :weight 'regular) 
+  (set-face-attribute 'variable-pitch nil :font "VictorMono Nerd Font-18") ;; :height archer-65/default-variable-font-size :weight 'regular) 
 
   ;; ORG
   ;; Replace list hyphen with dot
@@ -451,7 +572,7 @@
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
+    (set-face-attribute (car face) nil :font "VictorMono Nerd Font" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
@@ -605,6 +726,13 @@
   ;;(when (file-directory-p "~/Git")
   ;;  (setq projectile-project-search-path '("~/Git")))
   ;;(setq projectile-switch-project-action #'projectile-dired))
+
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
+(use-package company-nixos-options)
+
+;; (use-package nixos-option)
 
 (use-package yaml-mode)
 
@@ -786,13 +914,13 @@
   (mu4e t))
 
 (use-package mu4e-alert
-  :quelpa (mu4e-alert :fetcher git :url "https://github.com/xzz53/mu4e-alert")
+  ;; :quelpa (mu4e-alert :fetcher git :url "https://github.com/xzz53/mu4e-alert")
   :after mu4e
   :init
   (mu4e-alert-set-default-style 'libnotify)
 
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+  ;; (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
 
   (defun mu4e-alert--get-mu4e-frame ()
     "Try getting a frame containing a mu4e buffer."
