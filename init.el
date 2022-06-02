@@ -135,7 +135,7 @@
   :hook
   (after-init . doom-modeline-mode)
   :custom
-  (doom-modeline-height 15)
+  ;; (doom-modeline-height 35)
   (doom-modeline-bar-width 1)
   (doom-modeline-buffer-file-name-style 'buffer-name))
 
@@ -339,6 +339,8 @@
                  nil
                  (window-parameters (mode-line-format . none)))))
 
+(use-package wgrep)
+
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :ensure t
@@ -369,8 +371,9 @@
                           (bookmarks . 5)))
   (setq dashboard-set-haeding-icons t)
   (setq dashboard-set-file-icons t)
+  (setq dashboard-startup-banner "~/.emacs.d/img/stallman.png")
   (setq dashboard-banner-logo-title "Welcome to Emacs!")
-  (setq dashboard-startup-banner 'logo)
+  ;; (setq dashboard-startup-banner 'logo)
   (setq dashboard-set-navigator t)
   (setq dashboard-navigator-buttons
         `(
@@ -477,7 +480,8 @@
 
 (use-package meow
   :ensure t
-  :init
+  ;; :init
+  :config
   (meow-setup)
   (meow-global-mode 1))
 
@@ -502,6 +506,8 @@
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode))
+
+(delete-selection-mode 1)
 
 ;; Windmove with shift
 (when (fboundp 'windmove-default-keybindings)
@@ -602,11 +608,15 @@
   :hook (org-mode . archer-65/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
+  (setq org-pretty-entities 't)
 
-(use-package org-bullets
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+;; (use-package org-bullets
+;;   :hook (org-mode . org-bullets-mode)
+;;   :custom
+;;   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(use-package org-modern
+  :hook (org-mode . org-modern-mode))
 
 (defun archer-65/org-mode-visual-fill ()
   (setq visual-fill-column-width 170
@@ -694,7 +704,11 @@
   (require 'org-tempo)
 
   (add-to-list 'org-structure-template-alist '("bash" . "src bash"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("cc" . "src c")))
+
+(eval-after-load 'org
+  '(setf org-highlight-latex-and-related '(latex)))
 
 ;; Automatically tangle our Emacs.org config file when we save it
 (defun archer-65/org-babel-tangle-config ()
@@ -740,13 +754,20 @@
 
 (use-package lsp-mode
   :init
+  :config
+  (add-to-list 'lsp-language-id-configuration '(nix-mode . "nix"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection '("rnix-lsp"))
+                    :major-modes '(nix-mode)
+                    :server-id 'nix))
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
          (java-mode . lsp)
          (c-mode . lsp)
-         (c++-mod . lsp)
+         (c++-mode . lsp)
          (haskell-mode-hook . lsp)
+         (nix-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)

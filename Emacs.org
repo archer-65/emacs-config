@@ -201,7 +201,7 @@ The [[https://github.com/emacscollective/no-littering/blob/master/no-littering.e
     :hook
     (after-init . doom-modeline-mode)
     :custom
-    (doom-modeline-height 15)
+    ;; (doom-modeline-height 35)
     (doom-modeline-bar-width 1)
     (doom-modeline-buffer-file-name-style 'buffer-name))
 
@@ -445,6 +445,8 @@ For completions let's try [[https://github.com/minad/vertico][Vertico]] and [[ht
                    nil
                    (window-parameters (mode-line-format . none)))))
 
+  (use-package wgrep)
+
   ;; Consult users will also want the embark-consult package.
   (use-package embark-consult
     :ensure t
@@ -490,8 +492,9 @@ For completions let's try [[https://github.com/minad/vertico][Vertico]] and [[ht
                             (bookmarks . 5)))
     (setq dashboard-set-haeding-icons t)
     (setq dashboard-set-file-icons t)
+    (setq dashboard-startup-banner "~/.emacs.d/img/stallman.png")
     (setq dashboard-banner-logo-title "Welcome to Emacs!")
-    (setq dashboard-startup-banner 'logo)
+    ;; (setq dashboard-startup-banner 'logo)
     (setq dashboard-set-navigator t)
     (setq dashboard-navigator-buttons
           `(
@@ -606,7 +609,8 @@ For completions let's try [[https://github.com/minad/vertico][Vertico]] and [[ht
 
   (use-package meow
     :ensure t
-    :init
+    ;; :init
+    :config
     (meow-setup)
     (meow-global-mode 1))
 
@@ -659,6 +663,8 @@ Enable [[https://www.emacswiki.org/emacs/UndoTree][Undo Tree]] mode with a branc
 ** Buffer Utils
 
 #+begin_src emacs-lisp
+
+  (delete-selection-mode 1)
 
   ;; Windmove with shift
   (when (fboundp 'windmove-default-keybindings)
@@ -803,19 +809,23 @@ This section contains the basic configuration for =org-mode= plus the configurat
     :hook (org-mode . archer-65/org-mode-setup)
     :config
     (setq org-ellipsis " ▾")
-  
+    (setq org-pretty-entities 't)
+
 #+end_src
 
 *** Nicer Heading Bullets
 
-[[https://github.com/sabof/org-bullets][org-bullets]] replaces the heading stars in =org-mode= buffers with nicer looking characters that you can control.  Another option for this is [[https://github.com/integral-dw/org-superstar-mode][org-superstar-mode]] which we may cover in a later video.
+[[https://github.com/sabof/org-bullets][org-bullets]] replaces the heading stars in =org-mode= buffers with nicer looking characters that you can control.
 
 #+begin_src emacs-lisp
 
-  (use-package org-bullets
-    :hook (org-mode . org-bullets-mode)
-    :custom
-    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+  ;; (use-package org-bullets
+  ;;   :hook (org-mode . org-bullets-mode)
+  ;;   :custom
+  ;;   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+  (use-package org-modern
+    :hook (org-mode . org-modern-mode))
 
 #+end_src
 
@@ -945,7 +955,19 @@ You can add more =src= block templates below by copying one of the lines and cha
     (require 'org-tempo)
 
     (add-to-list 'org-structure-template-alist '("bash" . "src bash"))
-    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("cc" . "src c")))
+
+#+end_src
+
+** LaTeX Live
+
+This snippet is used to highlight LaTeX code in org files
+
+#+begin_src emacs-lisp
+
+  (eval-after-load 'org
+    '(setf org-highlight-latex-and-related '(latex)))
 
 #+end_src
 
@@ -1035,13 +1057,20 @@ This snippet adds a hook to =org-mode= buffers so that =archer-65/org-babel-tang
 
   (use-package lsp-mode
     :init
+    :config
+    (add-to-list 'lsp-language-id-configuration '(nix-mode . "nix"))
+    (lsp-register-client
+     (make-lsp-client :new-connection (lsp-stdio-connection '("rnix-lsp"))
+                      :major-modes '(nix-mode)
+                      :server-id 'nix))
     ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
     (setq lsp-keymap-prefix "C-c l")
     :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
            (java-mode . lsp)
            (c-mode . lsp)
-           (c++-mod . lsp)
+           (c++-mode . lsp)
            (haskell-mode-hook . lsp)
+           (nix-mode . lsp)
            ;; if you want which-key integration
            (lsp-mode . lsp-enable-which-key-integration))
     :commands lsp)
